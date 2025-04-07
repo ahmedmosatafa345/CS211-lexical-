@@ -1,15 +1,18 @@
 #include <iostream>
-#include <cstring>
+#include <cstring>  
 #include <cctype>   
-
 using namespace std;
 enum class TokenType {
-    
+
     IDENTIFIER,
     OPERATOR,
     NUMBER,
-    INT_LITERAL,
-    FLOAT_LITERAL,
+    INT,
+    FLOAT,
+    While,
+    For,
+    String,
+    Char,
     SEMICOLON,
     PARENTHESIS,
     BRACE,
@@ -21,61 +24,50 @@ enum class TokenType {
     END,
     UNKNOWN
 };
-
 struct Token {
     TokenType type;
     char lexeme[50];
 };
-
-
-
 bool isIdentifier(const char* str) {
     if (str[0] == '\0') return false;
     if (!(isalpha(str[0]) || str[0] == '_')) return false;
-
-    // Check for reserved keywords "int" and "for"
     if (strcmp(str, "int") == 0) return false;
     if (strcmp(str, "for") == 0) return false;
     if (strcmp(str, "while") == 0) return false;
     if (strcmp(str, "float") == 0) return false;
+    if (strcmp(str, "string") == 0) return false;
+    if (strcmp(str, "char") == 0) return false;
 
     for (int i = 0; str[i] != '\0'; i++) {
         if (!(isalnum(str[i]) || str[i] == '_')) return false;
     }
     return true;
 }
-
-
 bool isNumber(const char* str) {
     for (int i = 0; str[i] != '\0'; i++) {
-        if (!isdigit(str[i])) return false;  
+        if (!isdigit(str[i])) return false;
     }
     return true;
 }
-
 bool isFloatLiteral(const char* str) {
     bool foundDot = false;
     for (int i = 0; str[i] != '\0'; i++) {
         if (str[i] == '.') {
-            if (foundDot) return false;  
+            if (foundDot) return false;
             foundDot = true;
         }
         else if (!isdigit(str[i])) {
-            return false;  
+            return false;
         }
     }
-    return foundDot;  
+    return foundDot;
 }
-
-
 bool isIntLiteral(const char* str) {
     for (int i = 0; str[i] != '\0'; i++) {
-        if (!isdigit(str[i])) return false;  
+        if (!isdigit(str[i])) return false;
     }
     return true;
 }
-
-
 void OPERATORTYPE(char currentChar) {
     cout << "Lexeme: '" << currentChar << "', Token Type: ";
     if (currentChar == '+') {
@@ -122,8 +114,6 @@ void OPERATORTYPE(char currentChar) {
     }
     cout << endl;
 }
-
-
 void tokenize(const char* input) {
     char lexeme[50];
     int lexemeIndex = 0;
@@ -133,23 +123,29 @@ void tokenize(const char* input) {
 
         if (currentChar == ' ' || currentChar == '\t' || currentChar == '\n') {
             if (lexemeIndex > 0) {
-                lexeme[lexemeIndex] = '\0';  
-                
-                 if (isIdentifier(lexeme)) {
+                lexeme[lexemeIndex] = '\0';
+
+                if (isIdentifier(lexeme)) {
                     cout << "Lexeme: '" << lexeme << "', Token Type: IDENTIFIER" << endl;
                 }
-                 else if (strcmp(lexeme, "int") == 0) {
-                     cout << "Lexeme: '" << lexeme << "', Token Type: INT_KEYWORD" << endl;
-                 }
-                 else if (strcmp(lexeme, "for") == 0) {
-                     cout << "Lexeme: '" << lexeme << "', Token Type: FOR_KEYWORD" << endl;
-                 }
-                 else if (strcmp(lexeme, "while") == 0) {
-                     cout << "Lexeme: '" << lexeme << "', Token Type: while_KEYWORD" << endl;
-                 }
-                 else if (strcmp(lexeme, "float") == 0) {
-                     cout << "Lexeme: '" << lexeme << "', Token Type: float_KEYWORD" << endl;
-                 }
+                else if (strcmp(lexeme, "int") == 0) {
+                    cout << "Lexeme: '" << lexeme << "', Token Type: INT" << endl;
+                }
+                else if (strcmp(lexeme, "for") == 0) {
+                    cout << "Lexeme: '" << lexeme << "', Token Type: FOR" << endl;
+                }
+                else if (strcmp(lexeme, "while") == 0) {
+                    cout << "Lexeme: '" << lexeme << "', Token Type: while" << endl;
+                }
+                else if (strcmp(lexeme, "float") == 0) {
+                    cout << "Lexeme: '" << lexeme << "', Token Type: Resirved_word" << endl;
+                }
+                else if (strcmp(lexeme, "string") == 0) {
+                    cout << "Lexeme: '" << lexeme << "', Token Type: Resirved_word" << endl;
+                }
+                else if (strcmp(lexeme, "char") == 0) {
+                    cout << "Lexeme: '" << lexeme << "', Token Type: Resirved_word" << endl;
+                }
                 else if (isFloatLiteral(lexeme)) {
                     cout << "Lexeme: '" << lexeme << "', Token Type: FLOAT_LITERAL" << endl;
                 }
@@ -159,63 +155,56 @@ void tokenize(const char* input) {
                 else {
                     cout << "Lexeme: '" << lexeme << "', Token Type: UNKNOWN" << endl;
                 }
-                lexemeIndex = 0;  
+                lexemeIndex = 0;
             }
             continue;
         }
-
-        
         if (currentChar == '+' || currentChar == '-' || currentChar == '*' || currentChar == '/' ||
             currentChar == '=' || currentChar == '(' || currentChar == ')' || currentChar == ';' ||
             currentChar == '{' || currentChar == '}' || currentChar == '[' || currentChar == ']') {
             if (lexemeIndex > 0) {
-                lexeme[lexemeIndex] = '\0';  
+                lexeme[lexemeIndex] = '\0';
                 cout << "Lexeme: '" << lexeme << "', Token Type: IDENTIFIER" << endl;
                 lexemeIndex = 0;
             }
-            OPERATORTYPE(currentChar);  
+            OPERATORTYPE(currentChar);
             continue;
         }
-
-       
         if (currentChar == '=' && input[i + 1] == '=') {
             cout << "Lexeme: '==' , Token Type: COMPARISON" << endl;
-            i++;  
+            i++;
             continue;
         }
         else if (currentChar == '<' && input[i + 1] == '=') {
             cout << "Lexeme: '<=', Token Type: LE_COMPARISON" << endl;
-            i++;  
+            i++;
             continue;
         }
         else if (currentChar == '>' && input[i + 1] == '=') {
             cout << "Lexeme: '>=', Token Type: RE_COMPARISON" << endl;
-            i++; 
+            i++;
             continue;
         }
 
-        
+
         lexeme[lexemeIndex++] = currentChar;
     }
-
-    
     if (lexemeIndex > 0) {
-        lexeme[lexemeIndex] = '\0';  
-         if (isIdentifier(lexeme)) {
+        lexeme[lexemeIndex] = '\0';
+        if (isIdentifier(lexeme)) {
             cout << "Lexeme: '" << lexeme << "', Token Type: IDENTIFIER" << endl;
         }
         else if (isFloatLiteral(lexeme)) {
-            cout << "Lexeme: '" << lexeme << "', Token Type: FLOAT_LITERAL" << endl;
+            cout << "Lexeme: '" << lexeme << "', Token Type: FLOAT" << endl;
         }
         else if (isIntLiteral(lexeme)) {
-            cout << "Lexeme: '" << lexeme << "', Token Type: INT_LITERAL" << endl;
+            cout << "Lexeme: '" << lexeme << "', Token Type: INT" << endl;
         }
         else {
             cout << "Lexeme: '" << lexeme << "', Token Type: UNKNOWN" << endl;
         }
     }
 }
-
 int main() {
     char input[200];
     cout << "Enter a code snippet: ";
